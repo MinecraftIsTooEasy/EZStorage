@@ -1,0 +1,99 @@
+itemGroup.Simple Storage=简易存储
+
+tile.ezstorage:storage_core.name=存储核心
+tile.ezstorage:storage_box.name=存储箱
+tile.ezstorage:condensed_storage_box.name=压缩存储箱
+tile.ezstorage:hyper_storage_box.name=超级存储箱
+tile.ezstorage:input_port.name=物品代理接口
+tile.ezstorage:crafting_box.name=合成终端
+tile.ezstorage:storage_panel.name=存储面板
+tile.ezstorage:storage_cable.name=存储线缆
+
+hud.msg.ezstorage.general.holdshift=§o<按住 Shift>
+hud.msg.ezstorage.general.holdctrl=§o<按住 Ctrl>
+hud.msg.ezstorage.core.itemscount=物品: %s / %s 个
+hud.msg.ezstorage.core.typescount=种类: %s / %s 种
+hud.msg.ezstorage.core.inventoryid=库存ID: %s
+hud.msg.ezstorage.storage.capacity=容量: %s 个物品
+hud.msg.ezstorage.sort.mode.amount=排序方式: 数量
+hud.msg.ezstorage.sort.mode.name=排序方式: 名称
+hud.msg.ezstorage.sort.mode.mod=排序方式: 模组
+hud.msg.ezstorage.sort.order.descending=排序顺序: 降序
+hud.msg.ezstorage.sort.order.ascending=排序顺序: 升序
+hud.msg.ezstorage.search.mode.standard=搜索模式: 标准
+hud.msg.ezstorage.savesearch.on=保存搜索: 开
+hud.msg.ezstorage.savesearch.off=保存搜索: 关
+hud.msg.ezstorage.autorefill.on=自动补货: 开
+hud.msg.ezstorage.autorefill.off=自动补货: 关
+hud.msg.ezstorage.amount_count=%s / %s
+chat.msg.storagecore_connected=已连接到位于 x=%s y=%s z=%s 的存储核心
+chat.msg.storagecore_not_found=无法找到存储核心
+chat.msg.storagecore_out_of_range=存储核心超出范围
+chat.msg.storagecore_break_blocked_nonempty=该存储核心内还有物品，无法破坏
+
+key.categories.ezstorage=简易存储
+key.ezstorage.open_terminal=打开存储面板
+
+config.tab.storage=存储设置
+config.tab.gui=客户端设置
+
+config.name.ezstorage.basicCapacity=基础存储容量
+config.comment.ezstorage.basicCapacity=基础存储箱能存储的物品数量。
+config.name.ezstorage.condensedCapacity=压缩存储容量
+config.comment.ezstorage.condensedCapacity=压缩存储箱能存储的物品数量。
+config.name.ezstorage.hyperCapacity=超级存储容量
+config.comment.ezstorage.hyperCapacity=超级存储箱能存储的物品数量。
+config.name.ezstorage.maxItemTypes=最大物品种类
+config.comment.ezstorage.maxItemTypes=存储核心最多能存储的物品种类数量，0表示无限制。
+config.name.ezstorage.focusGuiInput=自动聚焦搜索框
+config.comment.ezstorage.focusGuiInput=打开存储GUI时自动聚焦搜索框。
+config.name.ezstorage.guiSortMode=GUI排序方式
+config.comment.ezstorage.guiSortMode=存储GUI上次使用的排序方式。
+config.name.ezstorage.guiSortOrder=GUI排序顺序
+config.comment.ezstorage.guiSortOrder=存储GUI上次使用的排序顺序。
+config.name.ezstorage.guiSearchMode=GUI搜索模式
+config.comment.ezstorage.guiSearchMode=存储GUI上次使用的搜索模式。
+config.name.ezstorage.guiSaveSearch=保存搜索文本
+config.comment.ezstorage.guiSaveSearch=重新打开GUI时是否保留搜索文本。
+config.name.ezstorage.guiAutoRefill=自动补货合成网格
+config.comment.ezstorage.guiAutoRefill=在合成终端合成后，自动从EZStorage补充合成材料。
+config.name.ezstorage.guiSearchText=已保存的搜索文本
+config.comment.ezstorage.guiSearchText=保存的搜索文本（仅在启用保存搜索时使用）。
+config.name.ezstorage.renderCraftingPreview=渲染合成终端台面预览
+config.comment.ezstorage.renderCraftingPreview=在世界中渲染已连接合成终端上方的合成材料预览。
+
+ezstorage.tier.basic=基础
+ezstorage.tier.copper=铜
+ezstorage.tier.silver=银
+ezstorage.tier.gold=金
+ezstorage.tier.iron=铁
+ezstorage.tier.ancient_metal=远古金属
+ezstorage.tier.mithril=秘银
+ezstorage.tier.adamantium=艾德曼
+
+ezstorage.crafting_box.upgrade.maxed=§e合成终端已是最高等级（艾德曼）。
+ezstorage.crafting_box.upgrade.need.group1=铜锭/银锭/金锭
+ezstorage.crafting_box.upgrade.need.group2=铁锭
+ezstorage.crafting_box.upgrade.need.group3=远古金属锭
+ezstorage.crafting_box.upgrade.need.group4=秘银锭
+ezstorage.crafting_box.upgrade.need.group5=艾德曼锭
+ezstorage.crafting_box.upgrade.need.default=更高级的材料
+ezstorage.crafting_box.upgrade.wrong_tier=§e无法升级：需要 %s 来升级。
+ezstorage.crafting_box.upgrade.success=§a合成终端已升级为：%s合成终端。
+
+ezstorage.crafting_box.tier_label=等级：%s
+ezstorage.crafting_box.speed_label=速度修正：%s
+ezstorage.crafting_box.upgrade_hint=§e[Ctrl+右键] 手持对应金属锭升级
+ezstorage.crafting.remaining_time=剩余时间：%s秒
+
+ezstorage.emi.info.storage_core=存储核心：网络的中央仓库核心，管理并连接所有简易存储方块。
+ezstorage.emi.info.storage_panel=存储面板：远程终端，可访问连接到的存储核心库存。
+ezstorage.emi.info.storage_box=存储箱：基础容量扩展方块。
+ezstorage.emi.info.condensed_storage_box=压缩存储箱：中阶容量扩展方块。
+ezstorage.emi.info.hyper_storage_box=超级存储箱：高阶容量扩展方块。
+ezstorage.emi.info.input_port=输入接口：将相邻容器物品导入存储网络。
+ezstorage.emi.info.storage_cable=存储线缆：连接各存储方块并延伸网络范围。
+ezstorage.emi.info.crafting_box=合成终端：使用网络材料进行 3x3 合成；终端等级决定可合成工具硬度上限。
+
+hud.msg.ezstorage.waila.connected=核心: x=%s y=%s z=%s
+hud.msg.ezstorage.waila.no_core=未连接到存储核心

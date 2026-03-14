@@ -1,0 +1,100 @@
+itemGroup.Simple Storage=Simple Storage
+
+tile.ezstorage:storage_core.name=Storage Core
+tile.ezstorage:storage_box.name=Storage Box
+tile.ezstorage:condensed_storage_box.name=Condensed Storage Box
+tile.ezstorage:hyper_storage_box.name=Hyper Storage Box
+tile.ezstorage:input_port.name=Inventory Proxy
+tile.ezstorage:crafting_box.name=Crafting Box
+tile.ezstorage:storage_panel.name=Storage Panel
+tile.ezstorage:storage_cable.name=Storage Cable
+
+hud.msg.ezstorage.general.holdshift=§o<Hold Shift>
+hud.msg.ezstorage.general.holdctrl=§o<Hold Ctrl>
+hud.msg.ezstorage.core.itemscount=%s / %s items
+hud.msg.ezstorage.core.typescount=%s / %s types
+hud.msg.ezstorage.core.inventoryid=%s
+hud.msg.ezstorage.storage.capacity=Capacity: %s items
+hud.msg.ezstorage.sort.mode.amount=Sort by: Amount
+hud.msg.ezstorage.sort.mode.name=Sort by: Name
+hud.msg.ezstorage.sort.mode.mod=Sort by: Mod
+hud.msg.ezstorage.sort.order.descending=Order: Descending
+hud.msg.ezstorage.sort.order.ascending=Order: Ascending
+hud.msg.ezstorage.search.mode.standard=Search: Standard
+hud.msg.ezstorage.savesearch.on=Save Search: ON
+hud.msg.ezstorage.savesearch.off=Save Search: OFF
+hud.msg.ezstorage.autorefill.on=Auto Refill: ON
+hud.msg.ezstorage.autorefill.off=Auto Refill: OFF
+hud.msg.ezstorage.amount_count=%s / %s
+
+chat.msg.storagecore_connected=Connected to Storage Core at x=%s y=%s z=%s
+chat.msg.storagecore_not_found=Storage core cannot be found
+chat.msg.storagecore_out_of_range=Storage core is out of range
+chat.msg.storagecore_break_blocked_nonempty=This Storage Core still contains items and cannot be broken
+
+key.categories.ezstorage=Simple Storage
+key.ezstorage.open_terminal=Open Storage Panel
+
+config.tab.storage=Storage settings
+config.tab.gui=Client settings
+
+config.name.ezstorage.basicCapacity=Basic Storage Capacity
+config.comment.ezstorage.basicCapacity=Number of items a basic storage box can hold.
+config.name.ezstorage.condensedCapacity=Condensed Storage Capacity
+config.comment.ezstorage.condensedCapacity=Number of items a condensed storage box can hold.
+config.name.ezstorage.hyperCapacity=Hyper Storage Capacity
+config.comment.ezstorage.hyperCapacity=Number of items a hyper storage box can hold.
+config.name.ezstorage.maxItemTypes=Max Item Types
+config.comment.ezstorage.maxItemTypes=Maximum number of different item types a storage core can hold. 0 = unlimited.
+config.name.ezstorage.focusGuiInput=Focus GUI Input
+config.comment.ezstorage.focusGuiInput=Focus the search field when opening the storage GUI.
+config.name.ezstorage.guiSortMode=GUI Sort Mode
+config.comment.ezstorage.guiSortMode=Last used sort mode for the storage GUI.
+config.name.ezstorage.guiSortOrder=GUI Sort Order
+config.comment.ezstorage.guiSortOrder=Last used sort order for the storage GUI.
+config.name.ezstorage.guiSearchMode=GUI Search Mode
+config.comment.ezstorage.guiSearchMode=Last used search mode for the storage GUI.
+config.name.ezstorage.guiSaveSearch=Save Search
+config.comment.ezstorage.guiSaveSearch=Whether the search text is preserved when reopening the GUI.
+config.name.ezstorage.guiAutoRefill=Auto Refill Crafting Grid
+config.comment.ezstorage.guiAutoRefill=Automatically refill crafting ingredients from EZStorage after crafting in the terminal.
+config.name.ezstorage.guiSearchText=Saved Search Text
+config.comment.ezstorage.guiSearchText=The saved search text (only used when Save Search is enabled).
+config.name.ezstorage.renderCraftingPreview=Render Crafting Preview
+config.comment.ezstorage.renderCraftingPreview=Render crafting ingredients above the linked terminal in world view.
+
+ezstorage.tier.basic=Basic
+ezstorage.tier.copper=Copper
+ezstorage.tier.silver=Silver
+ezstorage.tier.gold=Gold
+ezstorage.tier.iron=Iron
+ezstorage.tier.ancient_metal=Ancient Metal
+ezstorage.tier.mithril=Mithril
+ezstorage.tier.adamantium=Adamantium
+
+ezstorage.crafting_box.upgrade.maxed=§eCrafting Terminal is already at max tier (Adamantium).
+ezstorage.crafting_box.upgrade.need.group1=Copper/Silver/Gold Ingot
+ezstorage.crafting_box.upgrade.need.group2=Iron Ingot
+ezstorage.crafting_box.upgrade.need.group3=Ancient Metal Ingot
+ezstorage.crafting_box.upgrade.need.group4=Mithril Ingot
+ezstorage.crafting_box.upgrade.need.group5=Adamantium Ingot
+ezstorage.crafting_box.upgrade.need.default=a higher-tier material
+ezstorage.crafting_box.upgrade.wrong_tier=§eCannot upgrade: requires %s to upgrade.
+ezstorage.crafting_box.upgrade.success=§aCrafting Terminal upgraded to: %s Crafting Terminal.
+
+ezstorage.crafting_box.tier_label=Tier: %s
+ezstorage.crafting_box.speed_label=Speed Modifier: %s
+ezstorage.crafting_box.upgrade_hint=§e [Ctrl+Right-click] Upgrade while holding the corresponding metal ingot.
+ezstorage.crafting.remaining_time=Remaining time: %ss
+
+ezstorage.emi.info.storage_core=Storage Core: central inventory brain. Connects all EZStorage blocks in the network.
+ezstorage.emi.info.storage_panel=Storage Panel: remote terminal to access the connected Storage Core inventory.
+ezstorage.emi.info.storage_box=Storage Box: basic capacity expansion block for the network.
+ezstorage.emi.info.condensed_storage_box=Condensed Storage Box: medium-tier capacity expansion block.
+ezstorage.emi.info.hyper_storage_box=Hyper Storage Box: highest-tier capacity expansion block.
+ezstorage.emi.info.input_port=Input Port: imports items from adjacent inventories into the network.
+ezstorage.emi.info.storage_cable=Storage Cable: links storage blocks and extends network reach.
+ezstorage.emi.info.crafting_box=Crafting Terminal: 3x3 crafting with network materials; tier controls craftable tool hardness.
+
+hud.msg.ezstorage.waila.connected=Core: x=%s y=%s z=%s
+hud.msg.ezstorage.waila.no_core=Not connected to a Storage Core

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "${modId}",
+  "version": "${version}",
+  "depends": {
+    "fishmodloader": ">=3.4.2",
+    "rusted_iron_core": ">=1.5.0",
+    "many-lib": ">=2.3.0"
+  },
+  "suggests": {
+    "pinin": ">=1.6.0"
+  },
+  "environment": "*",
+  "name": "${modName}",
+  "description": "A very simple storage system without energy or complex structures.",
+  "icon": "assets/ezstorage/icon.png",
+  "license": "GPL-3.0",
+  "authors": [
+    "zerofall",
+    "Pilzinsel64",
+    "Inf1nlty"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MinecraftIsTooEasy/EZStorage",
+    "issues": "https://github.com/MinecraftIsTooEasy/EZStorage/issues"
+  },
+  "entrypoints": {
+    "main": [
+      "com.zerofall.ezstorage.EZStorage"
+    ],
+    "carryon": [
+      "com.zerofall.ezstorage.compat.EZCarryOnCompat"
+    ],
+    "emi": [
+      "com.zerofall.ezstorage.compat.EZEmiPlugin"
+    ]
+  },
+  "mixins": [
+    "ezstorage.mixins.json"
+  ],
+  "accessWidener": "ezstorage.accesswidener"
+}
