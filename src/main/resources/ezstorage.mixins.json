@@ -5,8 +5,9 @@
   "target": "DEFAULT",
   "minVersion": "0.8.3",
   "client": [
-    "RenderGlobalMixin",
-    "ClientPlayerMixin"
+    "ClientPlayerMixin",
+    "RenderBlocksMixin",
+    "RenderGlobalMixin"
   ],
   "injectors": {
     "defaultRequire": 1
