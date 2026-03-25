@@ -26,6 +26,7 @@ import org.lwjgl.opengl.GL11;
 import com.zerofall.ezstorage.Reference;
 import com.zerofall.ezstorage.configuration.EZConfiguration;
 import com.zerofall.ezstorage.container.ContainerStorageCore;
+import com.zerofall.ezstorage.container.ContainerStorageCoreCrafting;
 import com.zerofall.ezstorage.enums.SearchMode;
 import com.zerofall.ezstorage.enums.SortMode;
 import com.zerofall.ezstorage.enums.SortOrder;
@@ -586,7 +587,12 @@ public class GuiStorageCore extends GuiContainer {
             }
 
             Network.sendToServer(new C2SInvSlotClickedPacket(index, mouseButton, mode));
-            applyVisualSlotClick(slot, mouseButton, mode);
+
+            if (!(this.inventorySlots instanceof ContainerStorageCoreCrafting))
+            {
+                applyVisualSlotClick(slot, mouseButton, mode);
+            }
+
             this.searchField.setFocused(false);
             return;
         }

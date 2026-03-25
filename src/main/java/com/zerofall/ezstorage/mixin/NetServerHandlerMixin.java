@@ -45,6 +45,8 @@ public class NetServerHandlerMixin {
             return;
         }
 
+        container.syncCraftMatrixFromInventory();
+
         // In this container layout: 45 storage + 36 player inventory = crafting output slot at index 81.
         final int craftingOutputSlotIndex = 81;
 

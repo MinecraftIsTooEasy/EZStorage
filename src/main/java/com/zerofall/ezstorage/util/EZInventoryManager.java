@@ -20,6 +20,7 @@ import net.minecraft.WorldServer;
 import com.zerofall.ezstorage.EZStorage;
 import com.zerofall.ezstorage.Reference;
 import com.zerofall.ezstorage.container.ContainerStorageCore;
+import com.zerofall.ezstorage.container.ContainerStorageCoreCrafting;
 import com.zerofall.ezstorage.network.S2C.S2CStoragePacket;
 import com.zerofall.ezstorage.tileentity.TileEntityStorageCore;
 import moddedmite.rustedironcore.network.Network;
@@ -260,9 +261,15 @@ public class EZInventoryManager {
                     EntityPlayer player = (EntityPlayer) object;
                     if (player.openContainer instanceof ContainerStorageCore container)
                     {
-                        if (container.inventory == inventory && player instanceof ServerPlayer)
+                        if (container.inventory == inventory && player instanceof ServerPlayer serverPlayer)
                         {
-                            Network.sendToClient((ServerPlayer) player, new S2CStoragePacket(inventory));
+
+                            if (container instanceof ContainerStorageCoreCrafting craftingContainer)
+                            {
+                                craftingContainer.syncCraftMatrixFromInventory();
+                            }
+
+                            Network.sendToClient(serverPlayer, new S2CStoragePacket(inventory));
                         }
                     }
                 }

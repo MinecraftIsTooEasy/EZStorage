@@ -43,6 +43,20 @@ public abstract class SlotCraftingMixin {
             return;
         }
 
+        if (!player.worldObj.isRemote)
+        {
+            container.syncCraftMatrixFromInventory();
+
+            ItemStack authoritativeOutput = container.craftResult.getStackInSlot(0);
+
+            if (authoritativeOutput == null || !ItemStack.areItemStacksEqual(authoritativeOutput, craftedStack, true))
+            {
+                container.detectAndSendChanges();
+                ci.cancel();
+                return;
+            }
+        }
+
         container.beginSuppressCraftingReset();
 
         try
@@ -136,7 +150,7 @@ public abstract class SlotCraftingMixin {
 
             if (EZConfiguration.guiAutoRefill.getBooleanValue())
             {
-                container.tryToPopulateCraftingGrid(recipe, player, false);
+                container.tryToAutoRefillCraftingGrid(recipe, player);
             }
 
             container.saveGrid();

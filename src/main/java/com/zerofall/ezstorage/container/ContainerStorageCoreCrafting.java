@@ -65,6 +65,8 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
     private boolean hasCraftBoxPos;
     private boolean resumeProgressArmed;
     private int suppressCraftingResetDepth;
+    private int suppressMatrixBroadcastDepth;
+    private int lastSharedMatrixHash;
     private int resumeTicks;
     private int resumePeriod;
 
@@ -72,48 +74,14 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
     {
         this(player, world, 0, 0, 0, false);
         this.inventory = inventory;
-
-        if (this.inventory != null && this.inventory.craftMatrix != null)
-        {
-            boolean loaded = false;
-
-            for (int k = 0; k < 9; k++)
-            {
-                if (this.inventory.craftMatrix[k] != null)
-                {
-                    this.craftMatrix.setInventorySlotContents(k, this.inventory.craftMatrix[k]);
-                    loaded = true;
-                }
-            }
-            if (loaded)
-            {
-                this.onCraftMatrixChanged(this.craftMatrix);
-            }
-        }
+        this.syncCraftMatrixFromInventory();
     }
 
     public ContainerStorageCoreCrafting(EntityPlayer player, World world, EZInventory inventory, int craftBoxX, int craftBoxY, int craftBoxZ)
     {
         this(player, world, craftBoxX, craftBoxY, craftBoxZ, true);
         this.inventory = inventory;
-
-        if (this.inventory != null && this.inventory.craftMatrix != null)
-        {
-            boolean loaded = false;
-
-            for (int k = 0; k < 9; k++)
-            {
-                if (this.inventory.craftMatrix[k] != null)
-                {
-                    this.craftMatrix.setInventorySlotContents(k, this.inventory.craftMatrix[k]);
-                    loaded = true;
-                }
-            }
-            if (loaded)
-            {
-                this.onCraftMatrixChanged(this.craftMatrix);
-            }
-        }
+        this.syncCraftMatrixFromInventory();
     }
 
     public ContainerStorageCoreCrafting(EntityPlayer player, World world)
@@ -136,6 +104,8 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
         this.craftBoxZ = craftBoxZ;
         this.hasCraftBoxPos = hasCraftBoxPos;
         this.suppressCraftingResetDepth = 0;
+        this.suppressMatrixBroadcastDepth = 0;
+        this.lastSharedMatrixHash = Integer.MIN_VALUE;
         this.resumeTicks = -1;
         this.resumePeriod = -1;
         this.addSlotToContainer(new SlotCrafting(player, this.craftMatrix, this.craftResult, 0, 118, 132));
@@ -171,11 +141,13 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
         this.previous_crafting_result = this.current_crafting_result;
 
         tryRestoreCraftingProgressOnClient();
+        broadcastCraftMatrixToSharedStateIfNeeded();
     }
 
     public void beginSuppressCraftingReset()
     {
         this.suppressCraftingResetDepth++;
+        this.suppressMatrixBroadcastDepth++;
     }
 
     public void endSuppressCraftingReset()
@@ -184,11 +156,92 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
         {
             this.suppressCraftingResetDepth--;
         }
+
+        if (this.suppressMatrixBroadcastDepth > 0)
+        {
+            this.suppressMatrixBroadcastDepth--;
+        }
     }
 
     public boolean isSuppressingCraftingReset()
     {
         return this.suppressCraftingResetDepth > 0;
+    }
+
+    private boolean isSuppressingMatrixBroadcast()
+    {
+        return this.suppressMatrixBroadcastDepth > 0;
+    }
+
+    private void broadcastCraftMatrixToSharedStateIfNeeded()
+    {
+        if (this.player == null || this.player.worldObj == null || this.player.worldObj.isRemote)
+        {
+            return;
+        }
+
+        if (this.inventory == null || this.isSuppressingMatrixBroadcast())
+        {
+            return;
+        }
+
+        int matrixHash = computeMatrixHash();
+
+        if (matrixHash == this.lastSharedMatrixHash)
+        {
+            return;
+        }
+
+        this.saveGrid();
+        EZInventoryManager.sendToClients(this.inventory);
+    }
+
+    /**
+     * Server-side authority is inventory.craftMatrix; open crafting containers keep a local copy.
+     * This method refreshes the local matrix from the shared authoritative one.
+     */
+    public boolean syncCraftMatrixFromInventory()
+    {
+        if (this.inventory == null)
+        {
+            return false;
+        }
+
+        if (this.inventory.craftMatrix == null)
+        {
+            this.inventory.craftMatrix = new ItemStack[9];
+        }
+
+        boolean changed = false;
+        this.beginSuppressCraftingReset();
+
+        try
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                ItemStack authoritative = this.inventory.craftMatrix[i];
+                ItemStack local = this.craftMatrix.getStackInSlot(i);
+
+                if (!areCraftGridStacksEqual(local, authoritative))
+                {
+                    this.craftMatrix.setInventorySlotContents(i, authoritative == null ? null : authoritative.copy());
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                this.onCraftMatrixChanged(this.craftMatrix);
+            }
+
+            this.lastSharedMatrixHash = computeMatrixHash();
+        }
+        finally
+        {
+            this.endSuppressCraftingReset();
+        }
+
+        return changed;
     }
 
     private static long makeCraftBoxKey(int dim, int x, int y, int z)
@@ -546,12 +599,10 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
                         slotObject.onPickupFromSlot(playerIn, slotStack);
 
                         if (EZConfiguration.guiAutoRefill.getBooleanValue()
-                            && (slotObject.getStack() == null || !ItemStack.areItemStacksEqual(original, slotObject.getStack(), true)))
+                            && (slotObject.getStack() == null || !ItemStack.areItemStacksEqual(original, slotObject.getStack(), true))
+                            && this.tryToAutoRefillCraftingGrid(recipe, playerIn))
                         {
-                            if (tryToPopulateCraftingGrid(recipe, playerIn, false))
-                            {
-                                hasChanges = true;
-                            }
+                            hasChanges = true;
                         }
                         continue;
                     }
@@ -562,12 +613,10 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
                     slotObject.onPickupFromSlot(playerIn, slotStack);
 
                     if (EZConfiguration.guiAutoRefill.getBooleanValue()
-                        && (slotObject.getStack() == null || !ItemStack.areItemStacksEqual(original, slotObject.getStack(), true)))
+                        && (slotObject.getStack() == null || !ItemStack.areItemStacksEqual(original, slotObject.getStack(), true))
+                        && this.tryToAutoRefillCraftingGrid(recipe, playerIn))
                     {
-                        if (tryToPopulateCraftingGrid(recipe, playerIn, false))
-                        {
-                            hasChanges = true;
-                        }
+                        hasChanges = true;
                     }
                 }
 
@@ -647,7 +696,7 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
 
                         if (result != null
                             && EZConfiguration.guiAutoRefill.getBooleanValue()
-                            && tryToPopulateCraftingGrid(recipe, playerIn, false))
+                            && this.tryToAutoRefillCraftingGrid(recipe, playerIn))
                         {
                             saveGrid();
                             EZInventoryManager.sendToClients(inventory);
@@ -681,9 +730,178 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
         return super.customSlotClick(slotId, clickedButton, mode, playerIn);
     }
 
+    public boolean tryToAutoRefillCraftingGrid(ItemStack[][] recipe, EntityPlayer playerIn)
+    {
+        if (!canPopulateCraftingGridCompletely(recipe, playerIn, false))
+        {
+            return false;
+        }
+
+        return tryToPopulateCraftingGrid(recipe, playerIn, false);
+    }
+
+    private boolean canPopulateCraftingGridCompletely(ItemStack[][] recipe, EntityPlayer playerIn, boolean usePlayerInv)
+    {
+        if (recipe == null)
+        {
+            return false;
+        }
+
+        ArrayList<ItemStack> storagePool = new ArrayList<ItemStack>();
+
+        if (this.inventory != null && this.inventory.inventory != null)
+        {
+            for (ItemStack group : this.inventory.inventory)
+            {
+                addToSimulatedPool(storagePool, group);
+            }
+        }
+
+        ArrayList<ItemStack> playerPool = null;
+
+        if (usePlayerInv && playerIn != null && playerIn.inventory != null)
+        {
+            playerPool = new ArrayList<ItemStack>();
+
+            for (ItemStack group : playerIn.inventory.mainInventory)
+            {
+                addToSimulatedPool(playerPool, group);
+            }
+        }
+
+        for (int slotIndex = 0; slotIndex < recipe.length; slotIndex++)
+        {
+            ItemStack[] recipeItems = recipe[slotIndex];
+
+            Slot slot = getSlotFromInventory(this.craftMatrix, slotIndex);
+
+            if (slot == null)
+            {
+                continue;
+            }
+
+            ItemStack existing = slot.getStack();
+
+            if (recipeItems == null || recipeItems.length == 0 || !hasAnyRecipeCandidate(recipeItems))
+            {
+                if (existing != null)
+                {
+                    addToSimulatedPool(storagePool, existing);
+                }
+                continue;
+            }
+
+            if (existing != null && getMatchingItemStackForRecipe(recipeItems, existing) != null)
+            {
+                continue;
+            }
+
+            if (existing != null)
+            {
+                // A wrong item in this slot would be returned to storage by tryToPopulateCraftingGrid.
+                addToSimulatedPool(storagePool, existing);
+            }
+
+            if (consumeOneMatchingItem(storagePool, recipeItems))
+            {
+                continue;
+            }
+
+            if (usePlayerInv && consumeOneMatchingItem(playerPool, recipeItems))
+            {
+                continue;
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static void addToSimulatedPool(ArrayList<ItemStack> pool, ItemStack stack)
+    {
+        if (pool == null || stack == null || stack.stackSize <= 0)
+        {
+            return;
+        }
+
+        for (ItemStack pooled : pool)
+        {
+            if (EZInventory.stacksEqual(pooled, stack))
+            {
+                pooled.stackSize += stack.stackSize;
+                return;
+            }
+        }
+
+        pool.add(stack.copy());
+    }
+
+    private static boolean consumeOneMatchingItem(ArrayList<ItemStack> pool, ItemStack[] recipeItems)
+    {
+        if (pool == null || recipeItems == null)
+        {
+            return false;
+        }
+
+        for (ItemStack recipeItem : recipeItems)
+        {
+            if (recipeItem == null)
+            {
+                continue;
+            }
+
+            ItemStack required = recipeItem.copy();
+            required.stackSize = 1;
+
+            for (int i = 0; i < pool.size(); i++)
+            {
+                ItemStack candidate = pool.get(i);
+
+                if (!isRecipeItemValid(required, candidate))
+                {
+                    continue;
+                }
+
+                candidate.stackSize--;
+
+                if (candidate.stackSize <= 0)
+                {
+                    pool.remove(i);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean hasAnyRecipeCandidate(ItemStack[] recipeItems)
+    {
+        if (recipeItems == null)
+        {
+            return false;
+        }
+
+        for (ItemStack recipeItem : recipeItems)
+        {
+            if (recipeItem != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public boolean tryToPopulateCraftingGrid(ItemStack[][] recipe, EntityPlayer playerIn, boolean usePlayerInv)
     {
         boolean hasChanges = false;
+        this.beginSuppressCraftingReset();
+
+        try
+        {
         // Maps playerInv slot index -> list of crafting grid slots that need an item from that player slot
         HashMap<Integer, ArrayList<Slot>> playerInvSlotsMapping = new HashMap<>();
         final int craftingSlotsStartIndex = inventorySlots.size() - 3 * 3;
@@ -705,7 +923,12 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
                 if (getMatchingItemStackForRecipe(recipeItems, stackInSlot) != null)
                 {
                     // Already has a valid item — force GUI update
-                    inventoryItemStacks.set(craftingSlotsStartIndex + j, null);
+                    int visualIndex = craftingSlotsStartIndex + j;
+
+                    if (visualIndex >= 0 && visualIndex < inventoryItemStacks.size())
+                    {
+                        inventoryItemStacks.set(visualIndex, null);
+                    }
                     continue;
                 }
                 // Return wrong item to storage
@@ -846,6 +1069,11 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
         }
 
         return hasChanges;
+        }
+        finally
+        {
+            this.endSuppressCraftingReset();
+        }
     }
 
     private ItemStack getMatchingItemFromStorage(ItemStack recipeItem)
@@ -952,6 +1180,8 @@ public class ContainerStorageCoreCrafting extends ContainerStorageCore {
                 EZInventoryManager.saveInventory(this.inventory);
             }
         }
+
+        this.lastSharedMatrixHash = computeMatrixHash();
     }
 
     private static boolean areCraftGridStacksEqual(ItemStack left, ItemStack right)
