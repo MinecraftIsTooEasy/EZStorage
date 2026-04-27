@@ -27,6 +27,7 @@ public final class EZCraftingBoxCompat {
     public static final boolean HAS_ITFRB = FishModLoader.hasMod("mite-itf-reborn");
     public static final boolean HAS_BEX = FishModLoader.hasMod("bex");
     public static final boolean HAS_ITE = FishModLoader.hasMod("mite_ite");
+    public static final boolean HAS_EXTREME = FishModLoader.hasMod("extreme");
 
     private static boolean initialized;
 
@@ -230,10 +231,16 @@ public final class EZCraftingBoxCompat {
             return 0.2F;
         }
 
+        float reducedProfileModifier = getReducedProfileModifier(material);
+
+        if (reducedProfileModifier >= 0.0F) {
+            return reducedProfileModifier;
+        }
+
         float customModifier = getRustedIronWorkbenchSpeedModifier(material);
 
         if (customModifier >= 0.0F) {
-            return customModifier;
+            return applyVibraniumSpeed(material, customModifier);
         }
 
         if (material == Material.flint || material == Material.obsidian) {
@@ -255,13 +262,63 @@ public final class EZCraftingBoxCompat {
             return 0.7F;
         }
         if (material == vibraniumMaterial) {
-            return hasTungstenPath() ? 0.8F : 0.7F;
+            return applyVibraniumSpeed(material, hasTungstenPath() ? 0.8F : 0.7F);
         }
         if (material == infinityMaterial) {
             return hasTungstenPath() ? 0.9F : 0.8F;
         }
 
         return 0.2F;
+    }
+
+    /**
+     * ITE/Extreme globally reduce workbench crafting boosts.
+     * Keep EZStorage vibranium tier aligned with that profile.
+     */
+    private static float getReducedProfileModifier(Material material) {
+        if (!hasReducedWorkbenchBoostProfile()) {
+            return -1.0F;
+        }
+
+        if (material == Material.flint || material == Material.obsidian) {
+            return 0.0F;
+        }
+        if (material == Material.copper || material == Material.silver || material == Material.gold) {
+            return 0.1F;
+        }
+        if (material == Material.iron || material == nickelMaterial) {
+            return 0.2F;
+        }
+        if (material == Material.ancient_metal || material == Material.mithril) {
+            return 0.3F;
+        }
+        if (material == Material.adamantium || material == tungstenMaterial) {
+            return 0.4F;
+        }
+        if (material == vibraniumMaterial) {
+            return applyVibraniumSpeed(material, 0.55F);
+        }
+
+        return -1.0F;
+    }
+
+    private static float applyVibraniumSpeed(Material material, float modifier) {
+        if (material == vibraniumMaterial && hasReducedWorkbenchBoostProfile()) {
+            float adamantiumModifier = 0.4F;
+
+            float corrected = modifier;
+
+            if (corrected <= adamantiumModifier) {
+                corrected = Math.min(adamantiumModifier + 0.05F, 0.95F);
+            }
+
+            return corrected;
+        }
+        return modifier;
+    }
+
+    private static boolean hasReducedWorkbenchBoostProfile() {
+        return HAS_ITE || HAS_EXTREME;
     }
 
     public static Item getIngotForTier(int tier) {

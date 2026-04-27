@@ -1,5 +1,6 @@
 package com.zerofall.ezstorage.util;
 
+import com.zerofall.ezstorage.configuration.EZConfiguration;
 import net.minecraft.FontRenderer;
 import net.minecraft.Minecraft;
 import net.minecraft.Tessellator;
@@ -17,8 +18,8 @@ public class EZItemRenderer extends RenderItem {
         {
             super.renderItemOverlayIntoGUI(fontRenderer, Minecraft.getMinecraft().getTextureManager(), stack, xPosition, yPosition, "");
 
-            float ScaleFactor = 0.5f;
-            float RScaleFactor = 1.0f / ScaleFactor;
+            float scaleFactor = Math.max(0.05f, EZConfiguration.itemCountFontScalePercent.getIntegerValue() / 100.0f);
+            float rScaleFactor = 1.0f / scaleFactor;
             int offset = 0;
 
             boolean unicodeFlag = fontRenderer.getUnicodeFlag();
@@ -31,11 +32,11 @@ public class EZItemRenderer extends RenderItem {
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDisable(GL11.GL_DEPTH_TEST);
             GL11.glPushMatrix();
-            GL11.glScaled(ScaleFactor, ScaleFactor, ScaleFactor);
+            GL11.glScaled(scaleFactor, scaleFactor, scaleFactor);
             String var6;
             var6 = ReadableNumberConverter.INSTANCE.toWideReadableForm(amount);
-            int X = (int) (((float) xPosition + offset + 15.0f - fontRenderer.getStringWidth(var6) * ScaleFactor) * RScaleFactor);
-            int Y = (int) (((float) yPosition + offset + 15.0f - 7.0f * ScaleFactor) * RScaleFactor);
+            int X = (int) (((float) xPosition + offset + 15.0f - fontRenderer.getStringWidth(var6) * scaleFactor) * rScaleFactor);
+            int Y = (int) (((float) yPosition + offset + 15.0f - 7.0f * scaleFactor) * rScaleFactor);
             fontRenderer.drawStringWithShadow(var6, X, Y, 16777215);
             GL11.glPopMatrix();
             GL11.glEnable(GL11.GL_LIGHTING);

@@ -44,3 +44,4 @@ Feel free to open PRs for features, improvements, or compatibility fixes. I'm ma
 
 ## Credits
 This mod is a port of [EZStorage](https://github.com/LITW-Refined/EZStorage) by LITW-Refined. Thanks to LITW-Refined for the original work.
+The storage cable material uses Tom’s simple storage solution and is licensed under the MIT License.

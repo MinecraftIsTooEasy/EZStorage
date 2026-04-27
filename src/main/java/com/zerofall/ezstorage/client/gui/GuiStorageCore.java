@@ -24,6 +24,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import com.zerofall.ezstorage.Reference;
+import com.zerofall.ezstorage.compat.EZEmiSearchCompat;
 import com.zerofall.ezstorage.configuration.EZConfiguration;
 import com.zerofall.ezstorage.container.ContainerStorageCore;
 import com.zerofall.ezstorage.container.ContainerStorageCoreCrafting;
@@ -34,10 +35,12 @@ import com.zerofall.ezstorage.network.C2S.C2SInvSlotClickedPacket;
 import com.zerofall.ezstorage.util.EZInventory;
 import com.zerofall.ezstorage.util.EZItemRenderer;
 import com.zerofall.ezstorage.util.ItemStackCountComparator;
+import com.zerofall.ezstorage.util.ItemStackIdComparator;
 import com.zerofall.ezstorage.util.ItemStackModComparator;
 import com.zerofall.ezstorage.util.ItemStackNameComparator;
 import com.zerofall.ezstorage.util.PinyinSearchUtils;
 import moddedmite.rustedironcore.network.Network;
+import net.xiaoyu233.fml.FishModLoader;
 
 public class GuiStorageCore extends GuiContainer {
 
@@ -47,7 +50,7 @@ public class GuiStorageCore extends GuiContainer {
 
     protected static String searchText = "";
     protected static SearchMode currentSearchMode = SearchMode.STANDARD;
-    protected static SortMode currentSortMode = SortMode.AMOUNT;
+    protected static SortMode currentSortMode = SortMode.NAME;
     protected static SortOrder currentSortOrder = SortOrder.DESCENDING;
     protected static boolean saveSearch = false;
     protected static boolean autoRefill = true;
@@ -203,13 +206,18 @@ public class GuiStorageCore extends GuiContainer {
     {
         if (displayName != null && !displayName.isEmpty())
         {
-            this.searchField.setText(displayName);
-            searchText = displayName;
-            this.searchField.setFocused(true);
-            currentScroll = 0;
-            scrollRow = 0;
-            updateFilteredItems(true);
+            applySearchText(displayName);
         }
+    }
+
+    private void applySearchText(String text)
+    {
+        this.searchField.setText(text);
+        searchText = text;
+        this.searchField.setFocused(true);
+        currentScroll = 0;
+        scrollRow = 0;
+        updateFilteredItems(true);
     }
 
     // Button labels & tooltips
@@ -224,6 +232,8 @@ public class GuiStorageCore extends GuiContainer {
                         return "N";
                     case MOD:
                         return "M";
+                    case ID:
+                        return "I";
                     default:
                         return "#";
                 }
@@ -728,11 +738,47 @@ public class GuiStorageCore extends GuiContainer {
         }
     }
 
+    private boolean handleEmiFillSearchHotkey(int keyCode)
+    {
+        if (this.searchField == null || !EZConfiguration.emiFillSearchHotkey.getKeybind().matches(keyCode))
+        {
+            return false;
+        }
+
+        if (!FishModLoader.hasMod("emi"))
+        {
+            return false;
+        }
+
+        ItemStack hovered = EZEmiSearchCompat.getHoveredItemStack();
+        if (hovered == null)
+        {
+            return false;
+        }
+
+        String displayName = EnumChatFormatting.func_110646_a(hovered.getDisplayName());
+        if (displayName == null || displayName.isEmpty())
+        {
+            return false;
+        }
+
+        applySearchText(displayName);
+        heldChar = 0;
+        heldKey = 0;
+        this.mc.sndManager.playSound("random.click", (float) this.mc.thePlayer.posX, (float) this.mc.thePlayer.posY, (float) this.mc.thePlayer.posZ, 0.25F, 1.0F);
+        return true;
+    }
+
     @Override
     protected void keyTyped(char typedChar, int keyCode)
     {
         if (!this.checkHotbarKeys(keyCode))
         {
+            if (handleEmiFillSearchHotkey(keyCode))
+            {
+                return;
+            }
+
             if (this.searchField.isFocused() && this.searchField.textboxKeyTyped(typedChar, keyCode))
             {
                 currentScroll = 0;
@@ -820,6 +866,10 @@ public class GuiStorageCore extends GuiContainer {
 
             case MOD:
                 comparator = new ItemStackModComparator();
+                break;
+
+            case ID:
+                comparator = new ItemStackIdComparator();
                 break;
 
             default:
