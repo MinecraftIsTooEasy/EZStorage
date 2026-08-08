@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${modId}",
+  "id": "${id}",
   "version": "${version}",
   "depends": {
     "fishmodloader": ">=3.4.2",
@@ -11,7 +11,7 @@
     "pinin": ">=1.6.0"
   },
   "environment": "*",
-  "name": "${modName}",
+  "name": "${name}",
   "description": "A very simple storage system without energy or complex structures.",
   "icon": "assets/ezstorage/icon.png",
   "license": "GPL-3.0",

@@ -16,5 +16,8 @@
     "NetServerHandlerMixin",
     "GuiContainerMixin",
     "SlotCraftingMixin"
-  ]
+  ],
+  "overwrites": {
+    "requireAnnotations": true
+  }
 }
