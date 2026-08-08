@@ -326,7 +326,7 @@ public class GuiStorageCore extends GuiContainer {
                 break;
         }
 
-        this.mc.sndManager.playSound("random.click", (float) this.mc.thePlayer.posX, (float) this.mc.thePlayer.posY, (float) this.mc.thePlayer.posZ, 0.25F, 1.0F);
+        this.mc.sndManager.playSoundFX("random.click", 0.25F, 1.0F);
     }
 
     @Override
@@ -538,7 +538,7 @@ public class GuiStorageCore extends GuiContainer {
                 this.searchField.setText("");
                 searchText = "";
                 updateFilteredItems(true);
-                this.mc.sndManager.playSound("random.click", (float) this.mc.thePlayer.posX, (float) this.mc.thePlayer.posY, (float) this.mc.thePlayer.posZ, 0.25F, 1.0F);
+                this.mc.sndManager.playSoundFX("random.click", 0.25F, 1.0F);
                 return;
             }
         }
@@ -765,7 +765,7 @@ public class GuiStorageCore extends GuiContainer {
         applySearchText(displayName);
         heldChar = 0;
         heldKey = 0;
-        this.mc.sndManager.playSound("random.click", (float) this.mc.thePlayer.posX, (float) this.mc.thePlayer.posY, (float) this.mc.thePlayer.posZ, 0.25F, 1.0F);
+        this.mc.sndManager.playSoundFX("random.click", 0.25F, 1.0F);
         return true;
     }
 
@@ -1041,4 +1041,3 @@ public class GuiStorageCore extends GuiContainer {
         GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
-

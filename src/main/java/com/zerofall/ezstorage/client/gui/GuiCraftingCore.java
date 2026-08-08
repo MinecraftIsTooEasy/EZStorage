@@ -185,7 +185,7 @@ public class GuiCraftingCore extends GuiStorageCore {
         if (mouseButton == 0 && isOverClearBtn(mouseX, mouseY))
         {
             Network.sendToServer(new C2SClearCraftingGridPacket());
-            this.mc.sndManager.playSound("random.click", (float) this.mc.thePlayer.posX, (float) this.mc.thePlayer.posY, (float) this.mc.thePlayer.posZ, 0.25F, 1.0F);
+            this.mc.sndManager.playSoundFX("random.click", 0.25F, 1.0F);
             return;
         }
 
